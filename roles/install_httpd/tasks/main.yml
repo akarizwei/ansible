@@ -1,0 +1,42 @@
+---
+# tasks file for install_httpd
+
+- block:   # for rhel
+  - name: install httpd
+    yum: name=httpd state=latest
+  - name: activate httpd
+    service: name=httpd state=started enabled=yes
+  when: ansible_os_family == "RedHat"
+
+- block:   # for debian
+  - name: install apache
+    apt: name=apache2 state=latest
+  - name: activate httpd
+    service: name=apache2 state=started enabled=yes
+  when: ansible_os_family == "Debian"
+
+
+- name: make index file
+  copy:
+    content: "Welcome to my web server" 
+    dest: "{{ destination_folder }}/index.html"
+  notify:
+  - restart httpd rhel
+  - restard apache debian
+
+- name: open 80 port
+  firewalld:
+    service: http
+    permanent: yes
+    state: enabled
+
+- name: open 443 port
+  firewalld:
+    service: https
+    permanent: yes
+    state: enabled
+
+- name: reload service firewalld
+  systemd:
+    name: firewalld
+    state: reloaded

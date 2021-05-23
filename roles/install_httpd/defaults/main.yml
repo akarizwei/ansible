@@ -1,0 +1,3 @@
+---
+# defaults file for install_httpd
+destination_folder: /var/www/html

@@ -1,0 +1,9 @@
+---
+# handlers file for install_httpd
+- name: restart httpd rhel
+  service: name=httpd state=restarted
+  when: ansible_os_family == "RedHat"
+
+- name: restart apache debian
+  service: name=httpd state=restarted
+  when: ansible_os_family == "Debian"
