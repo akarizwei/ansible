@@ -1,0 +1,38 @@
+---
+- name: make work of homework
+  hosts: all
+  become_method: sudo
+  become_user: root
+
+  tasks:
+  - name: install httpd
+    yum:
+      name: httpd
+      state: latest
+  
+  - name: activate httpd
+    service:
+      name: httpd
+      state: started
+
+  - name: make index file
+    copy:
+      content: "Welcome to my web server"
+      dest: "/var/www/html/index.html"
+
+  - name: open 80 port
+    firewalld:
+      service: http
+      permanent: yes
+      state: enabled
+
+  - name: open 443 port
+    firewalld:
+      service: https
+      permanent: yes
+      state: enabled
+
+  - name: restart firewalld
+    service:
+      name: firewalld
+      state: restarted
