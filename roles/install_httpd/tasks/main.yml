@@ -22,7 +22,7 @@
     dest: "{{ destination_folder }}/index.html"
   notify:
   - restart httpd rhel
-  - restard apache debian
+  - restart apache debian
 
 - name: open 80 port
   firewalld:
