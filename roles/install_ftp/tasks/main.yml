@@ -1,0 +1,41 @@
+---
+# tasks file for install_ftp
+
+ - name: install vsfpd
+   yum: name=vsftpd  state=present
+
+ - name: enable firewall
+   service: name=firewalld state=started enabled=yes
+
+ - name: install httpd
+   yum: name=httpd state=latest
+
+ - name: enable httpd
+   service: name=httpd state=started enabled=yes
+
+ - name: allow http
+   firewalld: service=http permanent=true state=enabled immediate=true
+
+ - name: allow ftp
+   firewalld: port=21/tcp permanent=true state=enabled immediate=true
+
+ - name: create homedir for anon
+   file:  path=/var/ftp/pub/upload  state=directory  mode=0777
+
+ - name: edit vsftpd.conf
+   lineinfile:
+     dest: /etc/vsftpd/vsftpd.conf
+     backup: yes
+     backrefs: yes
+     state: present
+     regexp: "{{ item.regexp }}"
+     line: "{{ item.line }}"
+   with_items:
+    - { regexp: anonymous_enable=NO, line: anonymous_enable=YES }
+    - { regexp: anon_upload_enable, line: anon_upload_enable=YES }
+    - { regexp: anon_mkdir_write_enable, line: anon_mkdir_write_enable=YES }
+    - { regexp: anon_root, line: anon_root=/var/ftp/pub }
+
+ - name: restart vsftpd
+   service: name=vsftpd state=restarted enabled=yes
+
